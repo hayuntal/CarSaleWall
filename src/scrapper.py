@@ -4,6 +4,7 @@ import pandas as pd
 
 from telethon import TelegramClient
 from telethon.tl.functions.channels import JoinChannelRequest
+from constant import *
 
 # Configuration
 DATA_PATH = os.getenv('DATA_PATH')
@@ -11,6 +12,7 @@ API_ID = os.getenv('API_ID')
 API_HASH = os.getenv('API_HASH')
 PHONE_NUMBER = os.getenv('PHONE_NUMBER')
 CHANNEL_LINK = 't.me/carscoutbott'
+BASE_SHARE_URL = 'https://www.yad2.co.il/vehicles/item'
 
 # Initialize the Telegram client
 client = TelegramClient('session_name', API_ID, API_HASH)
@@ -26,26 +28,32 @@ async def join_channel(channel_link):
 
 
 def get_posts():
+    # TODO READ USER INPUT
+    # FILTERS = EXTRACT FILTERS FROM USER INPUT
+
     url = 'https://gw.yad2.co.il/feed-search-legacy/vehicles/cars'
+    # url = 'https://gw.yad2.co.il/feed-search-legacy/vehicles/cars?manufacturer=5%2C54%2C12&price=-1-160000'
+
     response = requests.get(url)
-    posts = response.json()['data']['feed']['feed_items']
+    posts = response.json()[DATA][FEED][FEED_ITEMS]
 
     data = load_data()
     new_posts = []
 
     for post in posts:
 
-        if (post['type'] == 'ad') and (post['id'] not in data['Id'].values):
-            kilometer = (post['row_3'][2][4:] + ' ק"מ ') if len(post['row_3']) >= 3 else "לא צוין"
+        if (post[TYPE] == AD) and (post[ID] not in data[ID_DATA].values):
+            kilometer = (post[ROW3][2][4:] + [KM]) if len(post[ROW3]) >= 3 else NO_WRITTERN
 
-            image = post['images']['Image1']['src'] if 'images' in post and 'Image1' in post['images'] and 'src' in \
-                                                       post['images']['Image1'] else None
+            image = post[IMAGES][IMAGE1][SOURCE] if IMAGES in post and IMAGE1 in post[IMAGES] and SOURCE in \
+                                                       post[IMAGES][IMAGE1] else None
 
-            city = post['city'] if 'city' in post else 'לא צוין'
+            city = post[CITY] if CITY in post else NO_WRITTERN
             params = {
-                'Id': post['id'], 'Company': post['manufacturer'], 'Model': post['model'], 'Year': post['year'],
-                'Kilometers': kilometer, 'Price': post['price'], 'Yad': post['Hand_text'],
-                'Contact Name': post['contact_name'], 'City': city, 'Image': image
+                'Id': post[AD_NUMBER], 'Company': post[MANUFACTURER], 'Model': post[MODEL], 'Year': post[YEAR],
+                'Kilometers': kilometer, 'Price': post[PRICE], 'Yad': post[HAND],
+                'Contact Name': post[CONTACT], 'City': city, 'Image': image,
+                'Link': f"{BASE_SHARE_URL}/{post[ID]}"
             }
             new_posts.append(params)
 
@@ -78,7 +86,8 @@ def convert_format_to_telegram(post):
         f"🖐️ יד: {post['Yad']}\n"
         f"💰 מחיר: {post['Price']}\n\n"
         f"📞 איש קשר: {post['Contact Name']}\n"
-        f"📍 איזור: {post['City']}"
+        f"📍 איזור: {post['City']}\n"
+        f"{post['Link']}"
     )
 
 
