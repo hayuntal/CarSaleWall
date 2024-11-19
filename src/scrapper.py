@@ -4,7 +4,7 @@ import pandas as pd
 
 from telethon import TelegramClient
 from telethon.tl.functions.channels import JoinChannelRequest
-from constant import *
+from constants import *
 
 # Configuration
 DATA_PATH = os.getenv('DATA_PATH')
