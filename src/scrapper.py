@@ -37,13 +37,12 @@ def get_posts():
     response = requests.get(url)
     posts = response.json()[DATA][FEED][FEED_ITEMS]
 
-    data = load_data()
     new_posts = []
 
     for post in posts:
 
-        if (post[TYPE] == AD) and (post[ID] not in data[ID_DATA].values):
-            kilometer = (post[ROW3][2][4:] + [KM]) if len(post[ROW3]) >= 3 else NO_WRITTERN
+        if post[TYPE] == AD:
+            kilometer = f'{post[ROW3][2][4:]} {KM}' if len(post[ROW3]) >= 3 else NO_WRITTERN
 
             image = post[IMAGES][IMAGE1][SOURCE] if IMAGES in post and IMAGE1 in post[IMAGES] and SOURCE in \
                                                        post[IMAGES][IMAGE1] else None
@@ -58,22 +57,6 @@ def get_posts():
             new_posts.append(params)
 
     return new_posts
-
-
-def load_data():
-    """Loads existing data from a CSV file."""
-    df = pd.read_csv(DATA_PATH)
-    return df
-
-def update_data(posts):
-    """
-    Updates the current dataframes, with the new posts
-    """
-    new_posts_df = pd.DataFrame(posts)[['Id', 'Company', 'Model', 'Kilometers', 'Price', 'Yad', 'Contact Name']] # New posts into dataframe
-    prev_posts_df = load_data() # Load the exists dataframe
-
-    updated_df = pd.concat([prev_posts_df, new_posts_df], ignore_index=False) # Merge the previous and current posts
-    updated_df.to_csv(DATA_PATH, index=False) # Save the updated dataframe into the csv file
 
 def convert_format_to_telegram(post):
     """
@@ -113,7 +96,6 @@ async def main():
             format_message = convert_format_to_telegram(post)
             await post_message(format_message, post['Image']) # Post to Telegram channel
         print(f"All {len(posts)} posts have been successfully sent and data updated.")
-        update_data(posts)
     else:
         print("No posts to send.")
 
