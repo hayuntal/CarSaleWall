@@ -85,7 +85,7 @@ async def post_message(message, image_path):
 
 
 async def main():
-    await client.start()
+    await client.start(phone=lambda: PHONE_NUMBER)
     await join_channel(CHANNEL_LINK) # Join to 'CarScoutBot channel'
 
     posts = get_posts()  # Get the new posts via Yad2
