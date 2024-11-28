@@ -7,7 +7,6 @@ from telethon.tl.functions.channels import JoinChannelRequest
 from constants import *
 
 # Configuration
-DATA_PATH = os.getenv('DATA_PATH')
 API_ID = os.getenv('API_ID')
 API_HASH = os.getenv('API_HASH')
 PHONE_NUMBER = os.getenv('PHONE_NUMBER')
