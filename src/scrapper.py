@@ -10,53 +10,49 @@ from constants import *
 API_ID = os.getenv('API_ID')
 API_HASH = os.getenv('API_HASH')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
+BASE_SHARE_URL = os.getenv('BASE_SHARE_URL')
+POST_URL = os.getenv('POST_URL')
 CHANNEL_LINK = 't.me/carscoutbott'
-BASE_SHARE_URL = 'https://gw.yad2.co.il/feed-search-legacy/vehicles/cars'
-POST_URL = 'https://www.yad2.co.il/vehicles/item'
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 async def join_channel(channel_link):
     """Attempts to join a Telegram channel."""
     try:
         await client(JoinChannelRequest(channel_link))
-        print(f'Successfully Joined Channel {channel_link}')
-    except:
-        print(f'Failed to Join Channel {channel_link}')
-
+        logging.info(f"Successfully joined channel {channel_link}")
+    except Exception as e:
+        logging.error(f"Failed to join channel {channel_link}: {e}")
 
 def get_posts():
-    # TODO READ USER INPUT
+    try:
+        response = requests.get(BASE_SHARE_URL)
+        posts = response.json()[DATA][FEED][FEED_ITEMS]
 
-    # FILTERS = EXTRACT FILTERS FROM USER INPUT
-    # url = 'https://gw.yad2.co.il/feed-search-legacy/vehicles/cars?manufacturer=5%2C54%2C12&price=-1-160000'
+        new_posts = []
+        for post in posts:
+            if post[TYPE] == AD:
+                kilometer = f'{post[ROW3][2][4:]} {KM}' if len(post[ROW3]) >= 3 else NO_WRITTERN
+                image = post[IMAGES][IMAGE1][SOURCE] if IMAGES in post and IMAGE1 in post[IMAGES] and SOURCE in \
+                                                           post[IMAGES][IMAGE1] else None
+                city = post[CITY] if CITY in post else NO_WRITTERN
+                params = {
+                    'Id': post[AD_NUMBER], 'Company': post[MANUFACTURER], 'Model': post[MODEL], 'Year': post[YEAR],
+                    'Kilometers': kilometer, 'Price': post[PRICE], 'Yad': post[HAND],
+                    'Contact Name': post[CONTACT], 'City': city, 'Image': image,
+                    'Link': f"{POST_URL}/{post[ID]}"
+                }
+                new_posts.append(params)
 
-    response = requests.get(BASE_SHARE_URL)
-    posts = response.json()[DATA][FEED][FEED_ITEMS]
-
-    new_posts = []
-
-    for post in posts:
-
-        if post[TYPE] == AD:
-            kilometer = f'{post[ROW3][2][4:]} {KM}' if len(post[ROW3]) >= 3 else NO_WRITTERN
-
-            image = post[IMAGES][IMAGE1][SOURCE] if IMAGES in post and IMAGE1 in post[IMAGES] and SOURCE in \
-                                                       post[IMAGES][IMAGE1] else None
-
-            city = post[CITY] if CITY in post else NO_WRITTERN
-            params = {
-                'Id': post[AD_NUMBER], 'Company': post[MANUFACTURER], 'Model': post[MODEL], 'Year': post[YEAR],
-                'Kilometers': kilometer, 'Price': post[PRICE], 'Yad': post[HAND],
-                'Contact Name': post[CONTACT], 'City': city, 'Image': image,
-                'Link': f"{POST_URL}/{post[ID]}"
-            }
-            new_posts.append(params)
-
-    return new_posts
+        logging.info(f"Retrieved {len(new_posts)} new posts.")
+        return new_posts
+    except Exception as e:
+        logging.error(f"Error retrieving posts: {e}")
+        return []
 
 def convert_format_to_telegram(post):
-    """
-    Change the format of each post, for telegram post
-    """
+    """Change the format of each post, for Telegram post"""
     return (
         f"🚗 חברה: {post['Company']}\n"
         f"🚙 דגם: {post['Model']} ({post['Year']})\n"
@@ -68,17 +64,15 @@ def convert_format_to_telegram(post):
         f"{post['Link']}"
     )
 
-
 async def post_message(message, image_path):
     try:
         if image_path is not None:
             await client.send_file(CHANNEL_LINK, image_path, caption=message)
         else:
             await client.send_message(CHANNEL_LINK, message)
-        print(f"Message posted successfully")
+        logging.info("Message posted successfully")
     except Exception as e:
-        print(f"Failed to post message: {e}")
-
+        logging.error(f"Failed to post message: {e}")
 
 async def main():
     try:
@@ -89,10 +83,9 @@ async def main():
             for post in posts:
                 format_message = convert_format_to_telegram(post)
                 await post_message(format_message, post['Image']) # Post to Telegram channel
-            print(f"All {len(posts)} posts have been successfully sent and data updated.")
+            logging.info(f"All {len(posts)} posts have been successfully sent and data updated.")
         else:
-            print("No posts to send.")
-
+            logging.info("No posts to send.")
     except asyncio.CancelledError:
         logging.error("The operation was cancelled.")
     except Exception as e:
