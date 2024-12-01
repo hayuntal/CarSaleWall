@@ -1,7 +1,7 @@
 import os
 import requests
 import asyncio
-
+import logging
 from telethon import TelegramClient, events
 from telethon.tl.functions.channels import JoinChannelRequest
 from constants import *
@@ -75,23 +75,31 @@ async def post_message(message, image_path):
             await client.send_file(CHANNEL_LINK, image_path, caption=message)
         else:
             await client.send_message(CHANNEL_LINK, message)
-        print(f"Message posted successfully in {CHANNEL_LINK}")
+        print(f"Message posted successfully")
     except Exception as e:
-        print(f"Failed to post message in {CHANNEL_LINK}: {e}")
+        print(f"Failed to post message: {e}")
 
 
 async def main():
-    await client.start(bot_token=BOT_TOKEN)
-    posts = get_posts()  # Get the new posts via Yad2
+    try:
+        await client.start(bot_token=BOT_TOKEN)
+        posts = get_posts()  # Get the new posts via Yad2
 
-    if len(posts) != 0:
-        for post in posts:
-            format_message = convert_format_to_telegram(post)
-            await post_message(format_message, post['Image']) # Post to Telegram channel
-        print(f"All {len(posts)} posts have been successfully sent and data updated.")
-    else:
-        print("No posts to send.")
+        if len(posts) != 0:
+            for post in posts:
+                format_message = convert_format_to_telegram(post)
+                await post_message(format_message, post['Image']) # Post to Telegram channel
+            print(f"All {len(posts)} posts have been successfully sent and data updated.")
+        else:
+            print("No posts to send.")
 
+    except asyncio.CancelledError:
+        logging.error("The operation was cancelled.")
+    except Exception as e:
+        logging.error(f"An unexpected error occurred: {e}")
+    finally:
+        await client.disconnect()
+        logging.info("Client disconnected.")
 
 if __name__ == "__main__":
     client = TelegramClient('bot_session', API_ID, API_HASH)
