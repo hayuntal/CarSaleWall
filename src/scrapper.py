@@ -1,6 +1,6 @@
 import os
 import requests
-import pandas as pd
+import asyncio
 
 from telethon import TelegramClient, events
 from telethon.tl.functions.channels import JoinChannelRequest
@@ -72,18 +72,16 @@ def convert_format_to_telegram(post):
 async def post_message(message, image_path):
     try:
         if image_path is not None:
-            await client.send_file(CHANNEL_LINK, image_path, caption=message) # Post with a car image
+            await client.send_file(CHANNEL_LINK, image_path, caption=message)
         else:
-            await client.send_message(CHANNEL_LINK, message) # Post without a car image
-            print(f"Message posted successfully in {CHANNEL_LINK}")
+            await client.send_message(CHANNEL_LINK, message)
+        print(f"Message posted successfully in {CHANNEL_LINK}")
     except Exception as e:
         print(f"Failed to post message in {CHANNEL_LINK}: {e}")
 
 
 async def main():
     await client.start(bot_token=BOT_TOKEN)
-    await join_channel(CHANNEL_LINK) # Join to 'CarScoutBot channel'
-
     posts = get_posts()  # Get the new posts via Yad2
 
     if len(posts) != 0:
@@ -97,6 +95,4 @@ async def main():
 
 if __name__ == "__main__":
     client = TelegramClient('bot_session', API_ID, API_HASH)
-
-    with client:
-        client.loop.run_until_complete(main())
+    asyncio.run(main())
