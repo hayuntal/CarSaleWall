@@ -2,19 +2,16 @@ import os
 import requests
 import pandas as pd
 
-from telethon import TelegramClient
+from telethon import TelegramClient, events
 from telethon.tl.functions.channels import JoinChannelRequest
 from constants import *
 
 # Configuration
 API_ID = os.getenv('API_ID')
 API_HASH = os.getenv('API_HASH')
-PHONE_NUMBER = os.getenv('PHONE_NUMBER')
+BOT_TOKEN = os.getenv('BOT_TOKEN')
 CHANNEL_LINK = 't.me/carscoutbott'
-BASE_SHARE_URL = 'https://www.yad2.co.il/vehicles/item'
-
-# Initialize the Telegram client
-client = TelegramClient('session_name', API_ID, API_HASH)
+BASE_SHARE_URL = 'https://gw.yad2.co.il/feed-search-legacy/vehicles/cars'
 
 
 async def join_channel(channel_link):
@@ -28,12 +25,11 @@ async def join_channel(channel_link):
 
 def get_posts():
     # TODO READ USER INPUT
-    # FILTERS = EXTRACT FILTERS FROM USER INPUT
 
-    url = 'https://gw.yad2.co.il/feed-search-legacy/vehicles/cars'
+    # FILTERS = EXTRACT FILTERS FROM USER INPUT
     # url = 'https://gw.yad2.co.il/feed-search-legacy/vehicles/cars?manufacturer=5%2C54%2C12&price=-1-160000'
 
-    response = requests.get(url)
+    response = requests.get(BASE_SHARE_URL)
     posts = response.json()[DATA][FEED][FEED_ITEMS]
 
     new_posts = []
@@ -85,7 +81,7 @@ async def post_message(message, image_path):
 
 
 async def main():
-    await client.start(phone=lambda: PHONE_NUMBER)
+    await client.start(bot_token=BOT_TOKEN)
     await join_channel(CHANNEL_LINK) # Join to 'CarScoutBot channel'
 
     posts = get_posts()  # Get the new posts via Yad2
@@ -100,5 +96,7 @@ async def main():
 
 
 if __name__ == "__main__":
+    client = TelegramClient('bot_session', API_ID, API_HASH)
+
     with client:
         client.loop.run_until_complete(main())
