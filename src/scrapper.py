@@ -12,7 +12,7 @@ API_HASH = os.getenv('API_HASH')
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 CHANNEL_LINK = 't.me/carscoutbott'
 BASE_SHARE_URL = 'https://gw.yad2.co.il/feed-search-legacy/vehicles/cars'
-
+POST_URL = 'https://www.yad2.co.il/vehicles/item'
 
 async def join_channel(channel_link):
     """Attempts to join a Telegram channel."""
@@ -27,6 +27,7 @@ def get_posts():
     # TODO READ USER INPUT
 
     # FILTERS = EXTRACT FILTERS FROM USER INPUT
+    url
     # url = 'https://gw.yad2.co.il/feed-search-legacy/vehicles/cars?manufacturer=5%2C54%2C12&price=-1-160000'
 
     response = requests.get(BASE_SHARE_URL)
