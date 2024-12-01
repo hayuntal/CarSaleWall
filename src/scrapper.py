@@ -27,7 +27,6 @@ def get_posts():
     # TODO READ USER INPUT
 
     # FILTERS = EXTRACT FILTERS FROM USER INPUT
-    url
     # url = 'https://gw.yad2.co.il/feed-search-legacy/vehicles/cars?manufacturer=5%2C54%2C12&price=-1-160000'
 
     response = requests.get(BASE_SHARE_URL)
@@ -48,7 +47,7 @@ def get_posts():
                 'Id': post[AD_NUMBER], 'Company': post[MANUFACTURER], 'Model': post[MODEL], 'Year': post[YEAR],
                 'Kilometers': kilometer, 'Price': post[PRICE], 'Yad': post[HAND],
                 'Contact Name': post[CONTACT], 'City': city, 'Image': image,
-                'Link': f"{BASE_SHARE_URL}/{post[ID]}"
+                'Link': f"{POST_URL}/{post[ID]}"
             }
             new_posts.append(params)
 
