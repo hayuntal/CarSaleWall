@@ -95,5 +95,7 @@ async def main():
         logging.info("Client disconnected.")
 
 if __name__ == "__main__":
+    logging.info(f'{API_ID=}')
+    logging.info(f'{API_HASH=}')
     client = TelegramClient('bot_session', API_ID, API_HASH)
     asyncio.run(main())
