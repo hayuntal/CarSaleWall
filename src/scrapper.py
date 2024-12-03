@@ -10,8 +10,8 @@ from constants import *
 API_ID = list(str(os.getenv('API_ID')))
 API_HASH = list(str(os.getenv('API_HASH')))
 BOT_TOKEN = os.getenv('BOT_TOKEN')
-BASE_SHARE_URL = os.getenv('BASE_SHARE_URL')
 POST_URL = os.getenv('POST_URL')
+BASE_SHARE_URL = 'https://gw.yad2.co.il/feed-search-legacy/vehicles/cars'
 CHANNEL_LINK = 't.me/carscoutbott'
 
 # Setup logging
