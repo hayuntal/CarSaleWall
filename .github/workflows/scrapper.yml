@@ -29,7 +29,7 @@ jobs:
       # Step 4: Run the scrapper script with environment variables
       - name: Run scrapper.py
         env:
-          API_ID: ${{ secrets.API_ID }}
+          API_ID: ${{secrets.API_ID}}
           API_HASH: ${{ secrets.API_HASH }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           POST_URL: ${{ secrets.POST_URL }}
