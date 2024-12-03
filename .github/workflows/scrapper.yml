@@ -2,27 +2,36 @@ name: Automate scrapper.py
 
 on:
   schedule:
-    # Run every 10 minutes
     - cron: "*/1 * * * *"
+  workflow_dispatch:
 
 jobs:
   run-scrapper:
     runs-on: ubuntu-latest
 
     steps:
-
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Step 2: Set up Python environment
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.12'
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Step 4: Run the scrapper script with environment variables
       - name: Run scrapper.py
+        env:
+          API_ID: ${{ secrets.API_ID }}
+          API_HASH: ${{ secrets.API_HASH }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          POST_URL: ${{ secrets.POST_URL }}
+
         run: python src/scrapper.py
