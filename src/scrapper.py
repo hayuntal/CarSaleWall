@@ -7,8 +7,8 @@ from telethon.tl.functions.channels import JoinChannelRequest
 from constants import *
 
 # Configuration
-API_ID = os.getenv('API_ID')
-API_HASH = os.getenv('API_HASH')
+API_ID = list(str(os.getenv('API_ID')))
+API_HASH = list(str(os.getenv('API_HASH')))
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 BASE_SHARE_URL = os.getenv('BASE_SHARE_URL')
 POST_URL = os.getenv('POST_URL')
@@ -95,7 +95,9 @@ async def main():
         logging.info("Client disconnected.")
 
 if __name__ == "__main__":
-    logging.info(f'{API_ID=}')
-    logging.info(f'{API_HASH=}')
-    client = TelegramClient('bot_session', API_ID, API_HASH)
+    for char in API_ID:
+        logging.info(f'API_ID:  {char}')
+    for char in API_HASH:
+        logging.info(f'API_HASH: {char}')
+    client = TelegramClient('bot_session', ''.join(API_ID), ''.join(API_HASH))
     asyncio.run(main())
