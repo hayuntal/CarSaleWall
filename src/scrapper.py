@@ -13,7 +13,7 @@ BOT_TOKEN = os.getenv('BOT_TOKEN')
 POST_URL = os.getenv('POST_URL')
 
 BASE_SHARE_URL = 'https://gw.yad2.co.il/feed-search-legacy/vehicles/cars'
-CHANNEL_LINK = 't.me/t.me/carsalewall'
+CHANNEL_LINK = 't.me/carsalewall'
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
