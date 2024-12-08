@@ -2,9 +2,8 @@ import os
 import requests
 import asyncio
 import logging
-import json
 
-from telethon import TelegramClient
+from telethon import TelegramClient, events
 from telethon.tl.functions.channels import JoinChannelRequest
 from constants import *
 
@@ -17,9 +16,6 @@ POST_URL = os.getenv('POST_URL')
 BASE_SHARE_URL = 'https://gw.yad2.co.il/feed-search-legacy/vehicles/cars'
 CHANNEL_LINK = 't.me/carsalewall'
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATASET_FILE = os.path.join(SCRIPT_DIR, '..', 'data', 'posted_cars.json')
-
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -30,22 +26,6 @@ async def join_channel(channel_link):
         logging.info(f"Successfully joined channel {channel_link}")
     except Exception as e:
         logging.error(f"Failed to join channel {channel_link}: {e}")
-
-def load_posted_cars():
-    """Load the list of posted cars from a JSON file."""
-    if os.path.exists(DATASET_FILE):
-        with open(DATASET_FILE, 'r', encoding='utf-8') as f:
-            try:
-                return json.load(f)
-            except json.JSONDecodeError:
-                return []
-    return []
-
-def save_posted_cars(posted_cars):
-    """Save the updated list of posted cars to a JSON file."""
-    with open(DATASET_FILE, 'w', encoding='utf-8') as f:
-        json.dump(posted_cars, f, ensure_ascii=False, indent=4)
-
 
 def get_posts():
     try:
@@ -99,27 +79,15 @@ async def post_message(message, image_path):
 async def main():
     try:
         await client.start(bot_token=BOT_TOKEN)
+        posts = get_posts()  # Get the new posts via Yad2
 
-        posted_cars = load_posted_cars()
-        posted_links = {car['Link'] for car in posted_cars}
-
-        posts = get_posts()
-        new_posts = [p for p in posts if p['Link'] not in posted_links]
-
-        if new_posts:
-            for post in new_posts:
+        if len(posts) != 0:
+            for post in posts:
                 format_message = convert_format_to_telegram(post)
-                await post_message(format_message, post['Image'])
-
-                # Add the newly posted car details to the dataset
-                posted_cars.append(post)
-                posted_links.add(post['Link'])
-
-            # Save the updated posted cars list
-            save_posted_cars(posted_cars)
-            logging.info(f"All {len(new_posts)} new posts have been successfully sent and recorded.")
+                await post_message(format_message, post['Image']) # Post to Telegram channel
+            logging.info(f"All {len(posts)} posts have been successfully sent and data updated.")
         else:
-            logging.info("No new posts to send.")
+            logging.info("No posts to send.")
     except asyncio.CancelledError:
         logging.error("The operation was cancelled.")
     except Exception as e:
