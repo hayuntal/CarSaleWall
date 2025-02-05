@@ -1,10 +1,10 @@
 # CarSaleWall
 
-**CarSaleWall** is a Telegram channel automation that fetches the latest car listings from [Yad2](https://www.yad2.co.il/) and posts new car ads directly to a Telegram channel every 10 minutes. By integrating with GitHub Actions, the project ensures that your Telegram audience always stays up-to-date with the newest car offers—fully automated and hassle-free.
+**CarSaleWall** is a Telegram channel automation that fetches the latest car listings from [Yad2](https://www.yad2.co.il/) and posts new car ads directly to a Telegram channel every 20 minutes. By integrating with GitHub Actions, the project ensures that your Telegram audience always stays up-to-date with the newest car offers—fully automated and hassle-free.
 
 ## Key Features
 
-- **Regular Updates:** Fetches and posts new listings every 10 minutes.
+- **Regular Updates:** Fetches and posts new listings every 20 minutes.
 - **Seamless Integration:** Uses GitHub Actions to schedule the scraping job—no separate servers required.
 - **Rich Car Listing Data:** Displays the car’s make, model, year, mileage, price, contact details, and a direct link to the listing.
 - **Automatic Telegram Posting:** Publishes the latest car ads to your Telegram channel, including the featured image, if available.
@@ -28,7 +28,7 @@ The project is composed of two main directories:
 2.**`.github/workflows`**  
    Contains GitHub Actions configuration files that schedule and run the scraping job.  
    - **scrapper.yml**: Defines a workflow that:
-     - Triggers every 10 minutes.
+     - Triggers every 20 minutes.
      - Installs dependencies.
      - Runs the `scrapper.py` script to fetch and post new listings to Telegram.
 
@@ -44,7 +44,7 @@ The project is composed of two main directories:
    Using the Telethon library, the script posts each new car advertisement to the Telegram channel `CarSaleWall`.
 
 4. **Automation via GitHub Actions:**  
-   The `scrapper.yml` workflow runs every 10 minutes. It:
+   The `scrapper.yml` workflow runs every 20 minutes. It:
    - Checks out the repository.
    - Sets up a Python environment.
    - Installs dependencies from `requirements.txt`.
@@ -80,7 +80,7 @@ These secrets are stored securely in your repository’s **Settings > Secrets an
    - Add `API_ID`, `API_HASH`, `BOT_TOKEN`, `POST_URL` as repository secrets.
 
 3. **Adjust the Schedule (Optional):**
-   The workflow runs every 10 minutes by default. If you want to change this interval:
+   The workflow runs every 20 minutes by default. If you want to change this interval:
    - Open `.github/workflows/scrapper.yml`
    - Modify the `cron` schedule to your desired frequency.
 
