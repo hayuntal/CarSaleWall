@@ -26,7 +26,7 @@ async def join_channel(channel_link):
         logging.info(f"Successfully joined channel {channel_link}")
     except Exception as e:
         logging.error(f"Failed to join channel {channel_link}: {e}")
-
+ 
 def get_posts():
     try:
         response = requests.get(BASE_SHARE_URL)
